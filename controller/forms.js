@@ -3,7 +3,8 @@ var router = express.Router();
 const validations = require("../module/validations");
 const logger = require("../logger");
 var MongoClient = require("mongodb").MongoClient;
-var url = process.env.DB_URL;
+var url =
+  "mongodb+srv://parrvaz:134625@cluster0.acrsm.mongodb.net/nodejsDB?retryWrites=true&w=majority";
 var dbName = process.env.DB_NAME;
 
 const collectionName = "forms";
@@ -15,7 +16,7 @@ router.use("/", function (req, res, next) {
 });
 
 MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
-  console.log("Connected to Database");
+  console.log("Connected to Database forms");
   const db = client.db(dbName);
   const formColeection = db.collection(collectionName);
   router
@@ -58,7 +59,16 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
 
   router.post("/create", (req, res) => {
     let data = req.body;
+
     data.response = [];
+    //for calcute sum of numeric item
+    let sum = {};
+    data.fields.map((field) => {
+      if (field.type == "Number") {
+        sum[field.name] = parseInt(0);
+      }
+    });
+    data.sum = sum;
 
     formColeection
       .insertOne(data)
@@ -67,6 +77,8 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
         res.send("form added successfully");
       })
       .catch((error) => console.error(error));
+
+    res.status(200).send("form added succesfull");
   });
 
   router.get("/", (req, res) => {

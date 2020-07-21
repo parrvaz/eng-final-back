@@ -2,8 +2,11 @@ var express = require("express");
 var router = express.Router();
 const validations = require("../module/validations");
 const logger = require("../logger");
+const polygonModule = require("../module/polygon");
+const { response } = require("express");
 var MongoClient = require("mongodb").MongoClient;
-var url = process.env.DB_URL;
+var url =
+  "mongodb+srv://parrvaz:134625@cluster0.acrsm.mongodb.net/nodejsDB?retryWrites=true&w=majority";
 var dbName = process.env.DB_NAME;
 
 const collectionName = "forms";
@@ -15,7 +18,7 @@ router.use("/", function (req, res, next) {
 });
 
 MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
-  console.log("Connected to Database");
+  console.log("Connected to Database control");
   const db = client.db(dbName);
   const formColeection = db.collection(collectionName);
 
@@ -31,6 +34,18 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
     formColeection
       .findOne({ id: req.params.id }, { projection: { _id: 0 } })
       .then((result) => {
+        //find aera
+        result.response.map((res) => {
+          Object.keys(res).map((item) => {
+            if (typeof res[item] == "object") {
+              res[item] = polygonModule.searchPolygons(res[item]);
+            }
+          });
+        });
+
+        //push sum of number
+        result.response.push(result.sum);
+
         res.status(200).json(result);
       });
   });

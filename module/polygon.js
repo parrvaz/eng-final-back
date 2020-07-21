@@ -3,8 +3,7 @@ const logger = require("../logger");
 var inside = require("point-in-polygon");
 
 const db = require("../data.json");
-const { features } = require("process");
-const { parse } = require("path");
+const { post } = require("../controller/forms");
 
 const addPolygon = function (polygon) {
   let lastId = 0;
@@ -38,8 +37,6 @@ const deletePolygon = function (id) {
   id = parseInt(id);
   for (var i = 0; i < db.features.length; i++) {
     if (db.features[i].id == id) {
-      console.log(db.features[i].id, i);
-
       db.features.splice(i, 1);
       fs.writeFileSync("data.json", JSON.stringify(db));
 
@@ -65,16 +62,18 @@ const searchPolygons = function (point) {
   let result = [];
   for (var i = 0; i < db.features.length; i++) {
     if (
-      inside([point.lat, point.long], db.features[i].geometry.coordinates[0])
+      inside(
+        [point.lng || point.long, point.lat],
+        db.features[i].geometry.coordinates[0]
+      )
     ) {
       logger.log(
         "info",
         `find match polygon: ${db.features[i].properties.name}`
       );
-      result.push(db.features[i]);
+      result.push(db.features[i].properties.name);
     }
   }
-
   return result;
 };
 

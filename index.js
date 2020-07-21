@@ -19,7 +19,7 @@ app.use(express.json());
 const dotenv = require("dotenv");
 dotenv.config();
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT;
 
 //admin
 app.use("/admin/forms", forms);
