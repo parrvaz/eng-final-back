@@ -3,7 +3,9 @@ var router = express.Router();
 const validations = require("../module/validations");
 const logger = require("../logger");
 const polygonModule = require("../module/polygon");
-const { response } = require("express");
+var converter = require("json-2-csv");
+const { request } = require("express");
+
 var MongoClient = require("mongodb").MongoClient;
 var url =
   "mongodb+srv://parrvaz:134625@cluster0.acrsm.mongodb.net/nodejsDB?retryWrites=true&w=majority";
@@ -26,7 +28,14 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
     formColeection
       .findOne({ id: req.params.id }, { projection: { _id: 0 } })
       .then((result) => {
-        res.status(200).download(result);
+        converter.json2csv(result.response, (err, csv) => {
+          if (err) {
+            throw err;
+          }
+          // print CSV string
+          res.attachment(`report-${req.params.id}.csv`);
+          res.status(200).send(csv);
+        });
       });
   });
 
