@@ -4,6 +4,7 @@ const validations = require("../module/validations");
 const logger = require("../logger");
 const polygonModule = require("../module/polygon");
 var converter = require("json-2-csv");
+
 const { request } = require("express");
 
 var MongoClient = require("mongodb").MongoClient;
@@ -32,7 +33,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
           if (err) {
             throw err;
           }
-          // print CSV string
+          console.log(result.response);
           res.attachment(`report-${req.params.id}.csv`);
           res.status(200).send(csv);
         });

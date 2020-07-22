@@ -38,7 +38,9 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
 
         //update sum
         Object.keys(sum).map((item) => {
-          newSum[item] = sum[item] + parseInt(data[item]);
+          if (data[item] != null)
+            newSum[item] = sum[item] + parseInt(data[item]);
+          else newSum[item] = sum[item];
         });
 
         formColeection
