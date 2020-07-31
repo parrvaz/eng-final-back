@@ -43,13 +43,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
     .put(function (req, res) {
       id = req.params.id;
       formColeection
-        .findOneAndUpdate(
-          { id: id },
-          { $set: req.body },
-          {
-            upsert: true,
-          }
-        )
+        .findOneAndUpdate({ id: id }, { $set: req.body }, {})
         .then((result) => {
           logger.log("info", `updated form with id=>${req.params.id}`);
           res.status(200).send("form updated");

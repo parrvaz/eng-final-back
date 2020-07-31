@@ -71,7 +71,22 @@ const searchPolygons = function (point) {
         "info",
         `find match polygon: ${db.features[i].properties.name}`
       );
-      result.push(db.features[i].properties.name);
+      result.push(db.features[i]);
+    }
+  }
+  return result;
+};
+
+const searchPolygonsName = function (point, polygons) {
+  let result = [];
+  for (var i = 0; i < polygons.length; i++) {
+    if (
+      inside(
+        [point.lng || point.long, point.lat],
+        polygons[i].geometry.coordinates[0]
+      )
+    ) {
+      result.push(polygons[i].properties.name);
     }
   }
   return result;
@@ -84,4 +99,5 @@ module.exports = {
   getSinglePolygon,
   updatePolygon,
   deletePolygon,
+  searchPolygonsName,
 };

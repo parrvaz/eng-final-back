@@ -40,6 +40,35 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
       });
   });
 
+  router.get("/:id/:area", function (req, res) {
+    formColeection
+      .findOne({ id: req.params.id }, { projection: { _id: 0 } })
+      .then((result) => {
+        let records = [];
+
+        //find record inside area
+        result.response.map((res) => {
+          res.area.map((geo) => {
+            if (geo.id == req.params.area) {
+              Object.keys(res).map((item) => {
+                if ((typeof res[item] == "object") & (item != "area")) {
+                  res[item] = polygonModule.searchPolygonsName(
+                    res[item],
+                    res.area
+                  );
+                }
+              });
+              records.push(res);
+            }
+          });
+        });
+
+        result.response = records;
+        delete result.sum;
+        res.status(200).json(result);
+      });
+  });
+
   router.get("/:id", function (req, res) {
     formColeection
       .findOne({ id: req.params.id }, { projection: { _id: 0 } })
@@ -47,8 +76,8 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
         //find aera
         result.response.map((res) => {
           Object.keys(res).map((item) => {
-            if (typeof res[item] == "object") {
-              res[item] = polygonModule.searchPolygons(res[item]);
+            if ((typeof res[item] == "object") & (item != "area")) {
+              res[item] = polygonModule.searchPolygonsName(res[item], res.area);
             }
           });
         });

@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const logger = require("../logger");
-const { search } = require("./forms");
+const polygonModule = require("../module/polygon");
 
 var MongoClient = require("mongodb").MongoClient;
 var url =
@@ -31,6 +31,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
     .put(function (req, res) {
       id = req.params.id;
       data = req.body;
+      let tempArea = [];
 
       let newSum = {};
       formColeection.findOne({ id: req.params.id }).then((result) => {
@@ -42,6 +43,14 @@ MongoClient.connect(url, { useUnifiedTopology: true }).then((client) => {
             newSum[item] = sum[item] + parseInt(data[item]);
           else newSum[item] = sum[item];
         });
+
+        //find area
+        Object.keys(data).map((item) => {
+          if (typeof data[item] == "object") {
+            tempArea.push(...polygonModule.searchPolygons(data[item]));
+          }
+        });
+        data.area = [...new Set(tempArea)];
 
         formColeection
           .findOneAndUpdate(
